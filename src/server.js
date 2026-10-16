@@ -109,6 +109,16 @@ app.get("/:shortCode", async (req, res) => {
   }
 });
 
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "URL Shortener API is running",
+    timestamp: new Date().toISOString()
+  });
+});
+
+
 // 5. Get URL analytics
 app.get("/api/stats/:shortCode", async (req, res) => {
   try {
