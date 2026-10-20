@@ -107,6 +107,24 @@ public:
         }
         cout << "Occupied spaces: " << vehicles.size() << "/" << capacity << "\n";
     }
+
+    void searchVehicle() const {
+        string number;
+        cout << "Enter vehicle number to search: ";
+        cin >> number;
+
+        for (const Vehicle& vehicle : vehicles) {
+            if (vehicle.vehicleNumber == number) {
+                cout << "\nVehicle found!\n"
+                     << "Vehicle number: " << vehicle.vehicleNumber << "\n"
+                     << "Vehicle type: " << vehicle.vehicleType << "\n"
+                     << "Entry time: " << ctime(&vehicle.entryTime);
+                return;
+            }
+        }
+
+        cout << "Vehicle not found in the parking lot.\n";
+    }
 };
 
 int main() {
@@ -127,6 +145,7 @@ int main() {
              << "1. Park vehicle\n"
              << "2. Remove vehicle\n"
              << "3. Display parked vehicles\n"
+             << "4. Search vehicle\n"
              << "0. Exit\n"
              << "Enter your choice: ";
 
@@ -146,6 +165,9 @@ int main() {
             break;
         case 3:
             parkingLot.displayVehicles();
+            break;
+        case 4:
+            parkingLot.searchVehicle();
             break;
         case 0:
             cout << "Exiting system...\n";
