@@ -108,7 +108,6 @@ public:
         cout << "Occupied spaces: " << vehicles.size() << "/" << capacity << "\n";
     }
 
-<<<<<<< HEAD
     void displayAvailableSpaces() const {
         const size_t occupiedSpaces = vehicles.size();
         const size_t availableSpaces =
@@ -118,8 +117,6 @@ public:
              << "\n";
     }
 
-=======
->>>>>>> 44d8177a4df685d8844d0d733d7e9cfd9bb8d6a8
     void searchVehicle() const {
         string number;
         cout << "Enter vehicle number to search: ";
