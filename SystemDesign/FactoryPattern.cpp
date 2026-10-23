@@ -59,6 +59,10 @@ public:
 
         throw invalid_argument("Unsupported vehicle type: " + vehicleType);
     }
+
+    static unique_ptr<Vehicle> createDefaultVehicle() {
+        return createVehicle("car");
+    }
 };
 
 int main() {
