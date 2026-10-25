@@ -155,10 +155,7 @@ int main() {
              << "2. Remove vehicle\n"
              << "3. Display parked vehicles\n"
              << "4. Search vehicle\n"
-<<<<<<< HEAD
              << "5. Display available spaces\n"
-=======
->>>>>>> 44d8177a4df685d8844d0d733d7e9cfd9bb8d6a8
              << "0. Exit\n"
              << "Enter your choice: ";
 
@@ -182,12 +179,9 @@ int main() {
         case 4:
             parkingLot.searchVehicle();
             break;
-<<<<<<< HEAD
         case 5:
             parkingLot.displayAvailableSpaces();
             break;
-=======
->>>>>>> 44d8177a4df685d8844d0d733d7e9cfd9bb8d6a8
         case 0:
             cout << "Exiting system...\n";
             break;

@@ -127,6 +127,18 @@ public:
         throw invalid_argument("Elevator ID was not found.");
     }
 
+    string getElevatorStatus(int elevatorId) const {
+        for (const Elevator& elevator : elevators_) {
+            if (elevator.id() == elevatorId) {
+                return "Elevator " + to_string(elevator.id()) +
+                       " is at floor " + to_string(elevator.currentFloor()) +
+                       " and is " + directionToString(elevator.direction()) + ".";
+            }
+        }
+
+        throw invalid_argument("Elevator ID was not found.");
+    }
+
     void run() {
         for (Elevator& elevator : elevators_) {
             elevator.moveUntilIdle();
@@ -153,6 +165,19 @@ private:
         return closest;
     }
 
+    static string directionToString(Direction direction) {
+        switch (direction) {
+            case Direction::Down:
+                return "moving down";
+            case Direction::Up:
+                return "moving up";
+            case Direction::Idle:
+                return "idle";
+        }
+
+        throw invalid_argument("Unknown elevator direction.");
+    }
+
     void validateFloor(int floor) const {
         if (floor < 0 || floor > maxFloor_) {
             throw out_of_range("Requested floor is outside the building.");
@@ -170,6 +195,7 @@ int main() {
         system.requestElevator(5, Direction::Up);
         system.requestElevator(8, Direction::Up);
         system.selectFloor(1, 2);
+        cout << system.getElevatorStatus(1) << '\n';
         system.run();
     } catch (const exception& error) {
         cerr << error.what() << '\n';
