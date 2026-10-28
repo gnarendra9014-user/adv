@@ -69,6 +69,16 @@ public:
         }
     }
 
+    bool cancelStop(int floor) {
+        const auto stop = find(stops_.begin(), stops_.end(), floor);
+        if (stop == stops_.end()) {
+            return false;
+        }
+
+        stops_.erase(stop);
+        return true;
+    }
+
     void moveUntilIdle() {
         while (!stops_.empty()) {
             const int destination = stops_.front();
