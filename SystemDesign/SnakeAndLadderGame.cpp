@@ -16,6 +16,7 @@
  *   - If a roll would take the player past cell 100 the turn is skipped.
  */
 
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -82,6 +83,32 @@ public:
             throw invalid_argument("Ladder top must be above its bottom.");
         }
         jumps_[bottom] = top;
+    }
+
+    // Prints all snakes and ladders on the board.
+    void printBoard() const {
+        vector<pair<int, int>> snakes, ladders;
+        for (const auto& [start, end] : jumps_) {
+            if (end < start) {
+                snakes.push_back({start, end});
+            } else {
+                ladders.push_back({start, end});
+            }
+        }
+
+        sort(snakes.begin(), snakes.end());
+        sort(ladders.begin(), ladders.end());
+
+        cout << "--- Board Layout ---\n";
+        cout << "Snakes (" << snakes.size() << "):\n";
+        for (const auto& [head, tail] : snakes) {
+            cout << "  " << head << " ↓ " << tail << "\n";
+        }
+        cout << "Ladders (" << ladders.size() << "):\n";
+        for (const auto& [bottom, top] : ladders) {
+            cout << "  " << bottom << " ↑ " << top << "\n";
+        }
+        cout << "--------------------\n";
     }
 
     // Returns the final position after resolving any snake/ladder at `cell`.
