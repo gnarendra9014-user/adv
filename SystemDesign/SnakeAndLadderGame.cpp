@@ -165,6 +165,35 @@ public:
                 if (gameOver_) break;
             }
         }
+
+        printLeaderboard();
+    }
+
+    // Prints players ranked by their board position (highest first).
+    void printLeaderboard() const {
+        vector<const Player*> ranked;
+        for (const auto& p : players_) {
+            ranked.push_back(&p);
+        }
+        sort(ranked.begin(), ranked.end(), [](const Player* a, const Player* b) {
+            return a->position() > b->position();
+        });
+
+        cout << "\n--- Leaderboard ---\n";
+        for (size_t i = 0; i < ranked.size(); ++i) {
+            cout << "  " << (i + 1) << ". " << ranked[i]->name()
+                 << " — cell " << ranked[i]->position() << "\n";
+        }
+        cout << "-------------------\n";
+    }
+
+    // Resets all player positions to 0 for a rematch on the same board.
+    void resetGame() {
+        for (auto& player : players_) {
+            player.setPosition(0);
+        }
+        gameOver_ = false;
+        cout << "Game has been reset. All players are back at start.\n";
     }
 
 private:
@@ -224,7 +253,13 @@ int main() {
         SnakeAndLadderGame game(board, die);
         game.addPlayer("Alice");
         game.addPlayer("Bob");
-        game.play();
+
+        board.printBoard();     // show the board layout before starting
+
+        game.play();            // play returns with leaderboard printed
+
+        game.resetGame();       // reset for a rematch
+        game.play();            // play again on the same board
 
     } catch (const exception& error) {
         cerr << "Error: " << error.what() << "\n";
