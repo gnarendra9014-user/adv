@@ -118,6 +118,25 @@ public:
         cout<<"Book Not Found.\n";
     }
 
+    void removeBook(){
+        int id;
+        cout<<"Enter Book ID to remove: ";
+        cin>>id;
+
+        for(auto it = books.begin(); it != books.end(); ++it){
+            if(it->id == id){
+                if(it->isIssued){
+                    cout<<"Cannot remove book! It is currently issued.\n";
+                    return;
+                }
+                books.erase(it);
+                cout<<"Book removed successfully!\n";
+                return;
+            }
+        }
+        cout<<"Book Not Found.\n";
+    }
+
 private:
     vector<Book> books;
 };
@@ -133,6 +152,7 @@ int main() {
         cout<<"3.Search Book\n";
         cout<<"4.Issue Book\n";
         cout<<"5.Return Book\n";
+        cout<<"6.Remove Book\n";
         cout<<"0.Exit\n";
         cout<<"Enter Your Choice: ";
         cin>>choice;
@@ -152,6 +172,9 @@ int main() {
                 break;
             case 5:
                 library.returnBook();
+                break;
+            case 6:
+                library.removeBook();
                 break;
             case 0:
                 cout<<"Exiting system....\n";
