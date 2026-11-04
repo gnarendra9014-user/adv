@@ -137,6 +137,37 @@ public:
         cout<<"Book Not Found.\n";
     }
 
+    void updateBook(){
+        int id;
+        cout<<"Enter Book ID to update: ";
+        cin>>id;
+        cin.ignore();
+
+        for(Book& book : books){
+            if(book.id == id){
+                string newTitle, newAuthor;
+
+                cout<<"Current Title: "<<book.title<<"\n";
+                cout<<"Enter New Title (press Enter to keep unchanged): ";
+                getline(cin, newTitle);
+                if(!newTitle.empty()){
+                    book.title = newTitle;
+                }
+
+                cout<<"Current Author: "<<book.author<<"\n";
+                cout<<"Enter New Author (press Enter to keep unchanged): ";
+                getline(cin, newAuthor);
+                if(!newAuthor.empty()){
+                    book.author = newAuthor;
+                }
+
+                cout<<"Book details updated successfully!\n";
+                return;
+            }
+        }
+        cout<<"Book Not Found.\n";
+    }
+
 private:
     vector<Book> books;
 };
@@ -153,6 +184,7 @@ int main() {
         cout<<"4.Issue Book\n";
         cout<<"5.Return Book\n";
         cout<<"6.Remove Book\n";
+        cout<<"7.Update Book\n";
         cout<<"0.Exit\n";
         cout<<"Enter Your Choice: ";
         cin>>choice;
@@ -175,6 +207,9 @@ int main() {
                 break;
             case 6:
                 library.removeBook();
+                break;
+            case 7:
+                library.updateBook();
                 break;
             case 0:
                 cout<<"Exiting system....\n";
