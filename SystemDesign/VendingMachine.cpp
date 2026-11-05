@@ -94,6 +94,24 @@ public:
         inventory_[slotCode] = ItemSlot(Item(name, price), quantity);
     }
 
+    void restockItem(const string& slotCode, int additionalQuantity) {
+        if (additionalQuantity <= 0) {
+            cout << "Restock quantity must be positive.\n";
+            return;
+        }
+
+        auto it = inventory_.find(slotCode);
+        if (it == inventory_.end()) {
+            cout << "Cannot restock. Slot code " << slotCode << " does not exist.\n";
+            return;
+        }
+
+        it->second.quantity += additionalQuantity;
+        cout << "Restocked slot [" << slotCode << "] (" << it->second.item.name 
+             << ") by +" << additionalQuantity 
+             << ". New stock: " << it->second.quantity << ".\n";
+    }
+
     bool hasItem(const string& slotCode) const {
         return inventory_.find(slotCode) != inventory_.end();
     }
@@ -288,6 +306,12 @@ int main() {
     vm.insertMoney(5.00);
     vm.selectItem("B2"); // Chocolate is out of stock
     vm.refund();
+
+    // Scenario 4: Restocking an out-of-stock item and purchasing it
+    cout << "\n--- Test 4: Restock item and purchase ---\n";
+    vm.restockItem("B2", 5);
+    vm.insertMoney(2.00);
+    vm.selectItem("B2");
 
     vm.displayInventory();
 
