@@ -256,6 +256,31 @@ public:
              << amount << " to " << toUser->getName() << ". Balances updated!\n";
     }
 
+    void showExpenseHistory() const {
+        cout << "\n================= EXPENSE HISTORY =================\n";
+        if (expenses_.empty()) {
+            cout << "No expenses recorded yet.\n";
+            cout << "===================================================\n";
+            return;
+        }
+
+        for (const auto& exp : expenses_) {
+            cout << "[" << exp->getId() << "] " << exp->getDescription()
+                 << " | Total: $" << fixed << setprecision(2) << exp->getTotalAmount()
+                 << " | Paid by: " << exp->getPaidBy()->getName() << "\n";
+            cout << "  Participants:\n";
+            for (const auto& split : exp->getSplits()) {
+                cout << "    - " << split.user->getName() << ": $"
+                     << fixed << setprecision(2) << split.amount;
+                if (split.percent > 0.0) {
+                    cout << " (" << setprecision(1) << split.percent << "%)";
+                }
+                cout << "\n";
+            }
+        }
+        cout << "===================================================\n";
+    }
+
 private:
     unordered_map<string, shared_ptr<User>> users_;
     vector<shared_ptr<Expense>> expenses_;
@@ -307,6 +332,9 @@ int main() {
     service.settlePayment("u2", "u1", 250.0);
     service.showBalanceForUser("u2");
     service.showBalances();
+
+    // 5. Expense history
+    service.showExpenseHistory();
 
     return 0;
 }
