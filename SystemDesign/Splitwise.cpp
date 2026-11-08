@@ -281,6 +281,23 @@ public:
         cout << "===================================================\n";
     }
 
+    double getTotalNetBalance(const string& userId) const {
+        auto user = getUser(userId);
+        if (!user) {
+            cout << "User " << userId << " not found!\n";
+            return 0.0;
+        }
+
+        double netBalance = 0.0;
+        auto it = balanceSheet_.find(userId);
+        if (it != balanceSheet_.end()) {
+            for (const auto& [_, amount] : it->second) {
+                netBalance += amount;
+            }
+        }
+        return netBalance;
+    }
+
 private:
     unordered_map<string, shared_ptr<User>> users_;
     vector<shared_ptr<Expense>> expenses_;
@@ -335,6 +352,17 @@ int main() {
 
     // 5. Expense history
     service.showExpenseHistory();
+
+    // 6. Total net balance check
+    cout << "\n--- Net Balances Summary ---\n";
+    for (const string& uid : {"u1", "u2", "u3", "u4"}) {
+        auto u = service.getUser(uid);
+        double net = service.getTotalNetBalance(uid);
+        cout << u->getName() << "'s Net Balance: "
+             << (net >= 0 ? "+$" : "-$") << fixed << setprecision(2) << std::abs(net)
+             << (net > 0.009 ? " (to receive)" : (net < -0.009 ? " (to pay)" : " (settled)"))
+             << "\n";
+    }
 
     return 0;
 }
