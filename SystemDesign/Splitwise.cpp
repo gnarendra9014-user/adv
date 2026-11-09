@@ -298,6 +298,52 @@ public:
         return netBalance;
     }
 
+    void simplifyDebts() {
+        cout << "\n============= SIMPLIFIED DEBTS =============\n";
+
+        // Step 1: Collect net balances for all registered users
+        vector<pair<string, double>> creditors; // net > 0 (owed money)
+        vector<pair<string, double>> debtors;   // net < 0 (owe money)
+
+        for (const auto& [id, _] : users_) {
+            double net = getTotalNetBalance(id);
+            if (net > 0.009) {
+                creditors.emplace_back(id, net);
+            } else if (net < -0.009) {
+                debtors.emplace_back(id, -net); // store positive amount owed
+            }
+        }
+
+        if (creditors.empty() && debtors.empty()) {
+            cout << "No pending debts to simplify! All accounts are settled.\n";
+            cout << "============================================\n";
+            return;
+        }
+
+        // Step 2: Greedy matching between largest creditor and largest debtor
+        size_t cIdx = 0, dIdx = 0;
+        int transactionCount = 0;
+
+        while (cIdx < creditors.size() && dIdx < debtors.size()) {
+            double settleAmt = min(creditors[cIdx].second, debtors[dIdx].second);
+
+            cout << users_.at(debtors[dIdx].first)->getName()
+                 << " pays "
+                 << users_.at(creditors[cIdx].first)->getName()
+                 << ": $" << fixed << setprecision(2) << settleAmt << "\n";
+
+            creditors[cIdx].second -= settleAmt;
+            debtors[dIdx].second -= settleAmt;
+            transactionCount++;
+
+            if (creditors[cIdx].second < 0.009) cIdx++;
+            if (debtors[dIdx].second < 0.009) dIdx++;
+        }
+
+        cout << "Simplified down to " << transactionCount << " transaction(s).\n";
+        cout << "============================================\n";
+    }
+
 private:
     unordered_map<string, shared_ptr<User>> users_;
     vector<shared_ptr<Expense>> expenses_;
@@ -363,6 +409,9 @@ int main() {
              << (net > 0.009 ? " (to receive)" : (net < -0.009 ? " (to pay)" : " (settled)"))
              << "\n";
     }
+
+    // 7. Simplify debts to minimize overall transactions
+    service.simplifyDebts();
 
     return 0;
 }
