@@ -163,6 +163,42 @@ public:
         return taskQueue_.size();
     }
 
+    // Prints status, remaining time, and type of all registered tasks
+    void printTaskStatus() const {
+        cout << "\n--- Task Scheduler Status Overview ---\n";
+        if (taskMap_.empty()) {
+            cout << "  No registered tasks.\n";
+            cout << "--------------------------------------\n";
+            return;
+        }
+
+        auto now = system_clock::now();
+        for (const auto& [id, task] : taskMap_) {
+            string statusStr;
+            switch (task->getStatus()) {
+                case TaskStatus::SCHEDULED: statusStr = "SCHEDULED"; break;
+                case TaskStatus::RUNNING:   statusStr = "RUNNING";   break;
+                case TaskStatus::COMPLETED: statusStr = "COMPLETED"; break;
+                case TaskStatus::CANCELLED: statusStr = "CANCELLED"; break;
+            }
+
+            cout << "• [" << id << "] " << task->getName()
+                 << " | Status: " << statusStr
+                 << " | Type: " << (task->isRecurring() ? "RECURRING" : "ONE-TIME");
+
+            if (task->getStatus() == TaskStatus::SCHEDULED) {
+                auto diff = duration_cast<milliseconds>(task->getExecutionTime() - now).count();
+                if (diff > 0) {
+                    cout << " | Next run in: " << diff << " ms";
+                } else {
+                    cout << " | Due now!";
+                }
+            }
+            cout << "\n";
+        }
+        cout << "--------------------------------------\n";
+    }
+
 private:
     priority_queue<shared_ptr<ScheduledTask>, vector<shared_ptr<ScheduledTask>>, TaskComparator> taskQueue_;
     unordered_map<string, shared_ptr<ScheduledTask>> taskMap_;
@@ -213,6 +249,9 @@ int main() {
     // Cancel recurring task
     cout << "\nCancelling recurring heartbeat task...\n";
     scheduler.cancel(heartBeatId);
+
+    // 5. Inspect final task registry statuses
+    scheduler.printTaskStatus();
 
     return 0;
 }
