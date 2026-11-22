@@ -49,6 +49,7 @@ public:
     TaskStatus getStatus() const { return status_; }
 
     void setStatus(TaskStatus s) { status_ = s; }
+    void setExecutionTime(system_clock::time_point t) { executionTime_ = t; }
     void rescheduleNext() {
         executionTime_ += interval_;
         status_ = TaskStatus::SCHEDULED;
@@ -129,6 +130,32 @@ public:
         }
         it->second->setStatus(TaskStatus::CANCELLED);
         cout << "[CANCELLED] Task " << taskId << " has been cancelled.\n";
+        return true;
+    }
+
+    // Reschedule an existing scheduled or recurring task with a new delay
+    bool reschedule(const string& taskId, milliseconds newDelay) {
+        auto it = taskMap_.find(taskId);
+        if (it == taskMap_.end()) {
+            cout << "[RESCHEDULE FAILED] Task " << taskId << " not found.\n";
+            return false;
+        }
+
+        auto task = it->second;
+        if (task->getStatus() != TaskStatus::SCHEDULED) {
+            cout << "[RESCHEDULE FAILED] Task " << taskId << " cannot be rescheduled because its status is not SCHEDULED.\n";
+            return false;
+        }
+
+        // Update the execution time to the new target time
+        auto newRunAt = system_clock::now() + newDelay;
+        task->setExecutionTime(newRunAt);
+
+        // Re-push into the priority queue to maintain min-heap ordering
+        taskQueue_.push(task);
+
+        cout << "[RESCHEDULED] Task " << taskId << " (" << task->getName()
+             << ") rescheduled to run in " << newDelay.count() << " ms.\n";
         return true;
     }
 
@@ -239,8 +266,16 @@ int main() {
     });
     scheduler.cancel(cancelledTaskId);
 
-    // 4. Simulate Scheduler Execution loop across ~450ms
-    cout << "\n--- 4. Running Scheduler Loop (450ms simulation) ---\n";
+    // 4. Task rescheduling demonstration
+    cout << "\n--- 4. Reschedule an Existing Task ---\n";
+    string delayTaskId = scheduler.schedule("Database Backup", milliseconds(50), []() {
+        cout << "   -> Performing Database Backup...\n";
+    });
+    // Postpone the backup from 50ms to 350ms
+    scheduler.reschedule(delayTaskId, milliseconds(350));
+
+    // 5. Simulate Scheduler Execution loop across ~450ms
+    cout << "\n--- 5. Running Scheduler Loop (450ms simulation) ---\n";
     for (int step = 0; step < 9; ++step) {
         scheduler.tick();
         this_thread::sleep_for(milliseconds(50));
@@ -250,7 +285,7 @@ int main() {
     cout << "\nCancelling recurring heartbeat task...\n";
     scheduler.cancel(heartBeatId);
 
-    // 5. Inspect final task registry statuses
+    // 6. Inspect final task registry statuses
     scheduler.printTaskStatus();
 
     return 0;
