@@ -190,6 +190,25 @@ public:
         return taskQueue_.size();
     }
 
+    // Immediately cancels all scheduled and recurring tasks
+    int cancelAll() {
+        int cancelledCount = 0;
+        for (auto& [id, task] : taskMap_) {
+            if (task->getStatus() == TaskStatus::SCHEDULED) {
+                task->setStatus(TaskStatus::CANCELLED);
+                cancelledCount++;
+            }
+        }
+
+        // Drain the priority queue
+        while (!taskQueue_.empty()) {
+            taskQueue_.pop();
+        }
+
+        cout << "[CANCEL ALL] Cancelled " << cancelledCount << " pending task(s). Queue emptied.\n";
+        return cancelledCount;
+    }
+
     // Prints status, remaining time, and type of all registered tasks
     void printTaskStatus() const {
         cout << "\n--- Task Scheduler Status Overview ---\n";
@@ -287,6 +306,14 @@ int main() {
 
     // 6. Inspect final task registry statuses
     scheduler.printTaskStatus();
+
+    // 7. Cancel all remaining tasks demonstration
+    cout << "\n--- 7. Schedule Extra Tasks & Cancel All ---\n";
+    scheduler.schedule("Sync Offline Data", milliseconds(500), []() {});
+    scheduler.schedule("Send Push Notifications", milliseconds(800), []() {});
+    cout << "Pending tasks before cancelAll: " << scheduler.pendingTaskCount() << "\n";
+    scheduler.cancelAll();
+    cout << "Pending tasks after cancelAll: " << scheduler.pendingTaskCount() << "\n";
 
     return 0;
 }
