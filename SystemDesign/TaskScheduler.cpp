@@ -209,6 +209,21 @@ public:
         return cancelledCount;
     }
 
+    // Returns a summary breakdown of tasks by their status
+    unordered_map<TaskStatus, int> getTaskCountByStatus() const {
+        unordered_map<TaskStatus, int> counts = {
+            {TaskStatus::SCHEDULED, 0},
+            {TaskStatus::RUNNING, 0},
+            {TaskStatus::COMPLETED, 0},
+            {TaskStatus::CANCELLED, 0}
+        };
+
+        for (const auto& [_, task] : taskMap_) {
+            counts[task->getStatus()]++;
+        }
+        return counts;
+    }
+
     // Prints status, remaining time, and type of all registered tasks
     void printTaskStatus() const {
         cout << "\n--- Task Scheduler Status Overview ---\n";
@@ -314,6 +329,13 @@ int main() {
     cout << "Pending tasks before cancelAll: " << scheduler.pendingTaskCount() << "\n";
     scheduler.cancelAll();
     cout << "Pending tasks after cancelAll: " << scheduler.pendingTaskCount() << "\n";
+
+    // 8. Task counts by status metric breakdown
+    cout << "\n--- 8. Task Metrics by Status ---\n";
+    auto metrics = scheduler.getTaskCountByStatus();
+    cout << "Completed: " << metrics[TaskStatus::COMPLETED] << "\n"
+         << "Cancelled: " << metrics[TaskStatus::CANCELLED] << "\n"
+         << "Scheduled: " << metrics[TaskStatus::SCHEDULED] << "\n";
 
     return 0;
 }
