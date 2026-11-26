@@ -224,6 +224,32 @@ public:
         return counts;
     }
 
+    // Force executes a specific task immediately regardless of scheduled delay
+    bool executeImmediately(const string& taskId) {
+        auto it = taskMap_.find(taskId);
+        if (it == taskMap_.end()) {
+            cout << "[EXECUTE FAILED] Task " << taskId << " not found.\n";
+            return false;
+        }
+
+        auto task = it->second;
+        if (task->getStatus() != TaskStatus::SCHEDULED) {
+            cout << "[EXECUTE FAILED] Task " << taskId
+                 << " cannot be executed immediately because its status is not SCHEDULED.\n";
+            return false;
+        }
+
+        cout << "[MANUAL TRIGGER] Triggering Task " << taskId << " immediately.\n";
+        task->execute();
+
+        // If recurring and still scheduled, re-insert to priority queue
+        if (task->isRecurring() && task->getStatus() == TaskStatus::SCHEDULED) {
+            taskQueue_.push(task);
+        }
+
+        return true;
+    }
+
     // Prints status, remaining time, and type of all registered tasks
     void printTaskStatus() const {
         cout << "\n--- Task Scheduler Status Overview ---\n";
@@ -336,6 +362,13 @@ int main() {
     cout << "Completed: " << metrics[TaskStatus::COMPLETED] << "\n"
          << "Cancelled: " << metrics[TaskStatus::CANCELLED] << "\n"
          << "Scheduled: " << metrics[TaskStatus::SCHEDULED] << "\n";
+
+    // 9. Manual immediate execution demonstration
+    cout << "\n--- 9. Execute Task Immediately ---\n";
+    string manualTaskId = scheduler.schedule("Emergency Security Patch", milliseconds(10000), []() {
+        cout << "   -> Security Patch Applied Immediately!\n";
+    });
+    scheduler.executeImmediately(manualTaskId);
 
     return 0;
 }
